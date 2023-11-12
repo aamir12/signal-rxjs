@@ -1,0 +1,29 @@
+<div class="card">
+    <div class="card-header">
+        Post List (Singal With Error Handling)
+    </div>
+  
+    <div class='card-body' *ngIf="postData.value();else loading">
+  
+      <div class="list-group">
+        <button type="button"
+                class="list-group-item"
+                *ngFor="let post of postData.value()">
+          {{ post.title }}
+        </button>
+      </div>
+    </div>
+    
+    <ng-template #loading>
+        <div class="text-center p-5" *ngIf="!postData.error(); else failed">
+          Loading...
+        </div>
+    </ng-template>
+  
+    <ng-template #failed>
+        <div class="alert alert-danger m-2"
+             *ngIf="postData.error()">
+          {{postData.error()?.message }}
+        </div>
+    </ng-template>
+  </div>
