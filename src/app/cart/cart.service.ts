@@ -7,9 +7,12 @@ import { CartItem } from "./cart";
 })
 export class CartService {
 
+  cartKey = 'CART';
+  constructor() {
+    this.cartItems.set(this.getStoreCartItem());
+  }
   
   cartItems = signal<CartItem[]>([]);
-
   // Total up the extended price for each item
   subTotal = computed(() => this.cartItems().reduce((a,b)=>a + b.quantity * +b.vehicle.cost_in_credits,0));
 
@@ -32,16 +35,28 @@ export class CartService {
     }else {
       this.cartItems.update(items => items.map(item => item.vehicle.name === vehicle.name? {...item,quantity : item.quantity + 1} : item ))
     }
+    this.storeCartItem();
   }
 
   // Remove the item from the cart
   removeFromCart(cartItem: CartItem): void {
     this.cartItems.update(items => items.filter(item => item.vehicle.name !== cartItem.vehicle.name ))
+    this.storeCartItem();
   }
 
   updateInCart(cartItem: CartItem, quantity: number) {
     this.cartItems.update(items => items.map(item => item.vehicle.name === cartItem.vehicle.name? {...item,quantity} : item ))
+    this.storeCartItem();
   }
 
+  storeCartItem() {
+    const cartItems = JSON.stringify(this.cartItems());
+    localStorage.setItem(this.cartKey,cartItems);
+  }
+
+  getStoreCartItem() {
+    const cartItems = JSON.parse(localStorage.getItem(this.cartKey) || "[]");
+    return cartItems;
+  }
   
 }
